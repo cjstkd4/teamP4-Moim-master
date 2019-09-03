@@ -51,6 +51,11 @@ public class CalendarFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
+
     public static CalendarFragment newInstance(String param1, String param2) {
         CalendarFragment fragment = new CalendarFragment();
         Bundle args = new Bundle();
@@ -82,7 +87,7 @@ public class CalendarFragment extends Fragment {
                              Bundle savedInstanceState) {
 //        이유는 모르지만 fragment에서는 View를 통해서 layout을 초기화 해줘야 한다.
         final View view = inflater.inflate(R.layout.fragment_calendar, container, false);
-
+        Log.d("[test]_cal_frag", "111111111");
 //        달력 객체 초기화
         customCalendarView = (CustomCalendarView) view.findViewById(R.id.custom_calendar_view);
 

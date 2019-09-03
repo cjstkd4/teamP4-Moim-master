@@ -71,6 +71,7 @@ public class MoimActivity extends AppCompatActivity implements View.OnClickListe
         user_id = intent.getStringExtra("user_id");
         item1 = (Mypage) getIntent().getSerializableExtra("item");
         mContentsPagerAdapter.setIntent(getIntent());
+        mContentsPagerAdapter.notifyDataSetChanged();
     }
 
     @Override

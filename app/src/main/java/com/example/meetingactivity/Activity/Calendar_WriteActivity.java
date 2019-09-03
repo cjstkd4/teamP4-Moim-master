@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.example.meetingactivity.Fragment.CalendarFragment;
 import com.example.meetingactivity.R;
 import com.example.meetingactivity.helper.DateTimeHelper;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -164,6 +165,7 @@ public class Calendar_WriteActivity extends AppCompatActivity implements View.On
 
     @Override
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()) {
 //          시간 Dialog
             case R.id.detail_write_time:

@@ -67,11 +67,6 @@ public class CustomCalendarView extends LinearLayout {
     List<Events> eventsList = new ArrayList<>();
     DBOpenHelper dbOpenHelper;
 
-//    public CustomCalendarView(Context context) {
-//        super(context);
-//        Log.d("[test]_custCal", "11111");
-//    }
-
     //    fragment에서 값을 전달 받아서 item값 가져오기
     public static void CustomCalendar_date(Mypage custom_item, String custom_user_id) {
         mypage_item = custom_item;
@@ -83,6 +78,7 @@ public class CustomCalendarView extends LinearLayout {
         this.context = context;
         IntializeLayout();
         SetUpCalendar();
+        calendarAdapter.notifyDataSetChanged();
 
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
