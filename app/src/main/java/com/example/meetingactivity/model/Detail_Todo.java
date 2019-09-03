@@ -8,10 +8,19 @@ public class Detail_Todo implements Serializable {
     private int sch_schnum;     // 일정 코드
     private int moimcode;       // 모임 코드
     private int amount;         // 회비
+    private boolean ispay;      // 회비 납입 여부
     private String todo;        // 역할
     private String ex;          // 내용
 
     public Detail_Todo() {
+    }
+
+    public boolean isIspay() {
+        return ispay;
+    }
+
+    public void setIspay(boolean ispay) {
+        this.ispay = ispay;
     }
 
     public String getDetail_item_img() {

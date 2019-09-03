@@ -7,10 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,18 +15,17 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.meetingactivity.Fragment.CalendarFragment;
+import com.example.meetingactivity.DetailMemberUpdates;
 import com.example.meetingactivity.R;
 import com.example.meetingactivity.Response.Detail_MemberResponse;
-import com.example.meetingactivity.Response.Detail_Response;
 import com.example.meetingactivity.adapter.Detail_MemberAdapter;
-import com.example.meetingactivity.adapter.MemberAdapter;
 import com.example.meetingactivity.model.Calendar;
 import com.example.meetingactivity.model.Detail_Todo;
 import com.example.meetingactivity.model.Mypage;
@@ -42,7 +38,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
-import com.loopj.android.http.ResponseHandlerInterface;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,10 +66,10 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
 
     //    navigation 기능 객체 선언
     DrawerLayout mDrawerLayout;
-    ListView calendar_right;
-    ActionBarDrawerToggle mDrawerToggle;
+    ListView detail_right;
     Calendar calendar_item;
     List<Detail_Todo> detail_todo_list;
+    Detail_Todo detail_todo;
 
     //    클라이언트
     AsyncHttpClient client;
@@ -89,10 +84,6 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
 
         user_id = getIntent().getStringExtra("user_id");
         mypage_item = (Mypage) getIntent().getSerializableExtra("mypage_item");
-
-        detail_todo_list = new ArrayList<>();
-
-        detail_memberAdapter = new Detail_MemberAdapter(this, R.layout.detail_member_item, detail_todo_list);
 
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         fb_open = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fab_open);
@@ -114,23 +105,47 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
         detail_write_mony = findViewById(R.id.detail_write_mony);
 
 
-
         // 지도
         mapFragment.getMapAsync(this);
 
 //    navigation 기능 객체 초기화
         mDrawerLayout = findViewById(R.id.calendar_read);
-        calendar_right = findViewById(R.id.Detail_right);
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        detail_right = findViewById(R.id.detail_right);
         client = new AsyncHttpClient();
-
-        calendar_right.setAdapter(detail_memberAdapter);
+        detail_todo_list = new ArrayList<>();
+        detail_memberAdapter = new Detail_MemberAdapter(this, R.layout.detail_member_item, detail_todo_list);
+        detail_memberResponse = new Detail_MemberResponse(detail_memberAdapter);
+        detail_right.setAdapter(detail_memberAdapter);
 
         fab_main.setOnClickListener(this);
         fab_sub1.setOnClickListener(this);
         fab_sub2.setOnClickListener(this);
         fab_sub3.setOnClickListener(this);
         detail_read_bt2.setOnClickListener(this);
+
+
+//        if (mypage_item.getPermit() == 1) {
+        //                detail_todo = detail_memberAdapter.getItem(position);
+//                Intent intent1 = new Intent(Calendar_ReadActivity.this, Detail_member_Update.class);
+//                intent1.putExtra("calendar_item", calendar_item);
+//                intent1.putExtra("mypage_item", mypage_item);
+//                intent1.putExtra("detail_todo", detail_todo);
+//                intent1.putExtra("user_id", user_id);
+//
+//                Calendar_ReadActivity.this.startActivity(intent1);
+//        }
+        detail_right.setOnItemClickListener(new ListView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                detail_todo = detail_memberAdapter.getItem(position);
+                Intent intent = new Intent(Calendar_ReadActivity.this, DetailMemberUpdates.class);
+                intent.putExtra("calendar_item", calendar_item);
+                intent.putExtra("detail_todo", detail_todo);
+                intent.putExtra("user_id", user_id);
+                Log.d("[test]_cal_read", "user_id : " + user_id);
+                startActivity(intent);
+            }
+        });
 
         permissionCheck();
     }
@@ -139,6 +154,7 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
     protected void onResume() {
         super.onResume();
         client_connection();
+        detail_memberAdapter.notifyDataSetChanged();
     }
 
     private void client_connection() {
@@ -179,13 +195,12 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
     }
 
     private void setData() {
-        Detail_Todo detail_todo = new Detail_Todo();
+        detail_todo = new Detail_Todo();
         detail_todo.setMoimcode(calendar_item.getSch_moimcode());
         detail_todo.setSch_schnum(calendar_item.getSch_schnum());
         detail_todo.setId(user_id);
         lat = calendar_item.getSch_lat();
         lot = calendar_item.getSch_lot();
-        Log.d("[test]_read","값 : " + lat + " / " + lot);
         detail_write_name.setText(calendar_item.getSch_title());
         detail_read_date.setText(calendar_item.getSch_year() + " - " + calendar_item.getSch_month() + " - " + calendar_item.getSch_day());
         detail_read_time.setText(calendar_item.getSch_time());
@@ -227,19 +242,19 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
 //                참가자 인원 확인
             case R.id.fab_sub2:
 //                닫힘 동작
-                if (mDrawerLayout.isDrawerOpen(calendar_right)) {
-                    mDrawerLayout.closeDrawer(calendar_right);
+                if (mDrawerLayout.isDrawerOpen(detail_right)) {
+                    mDrawerLayout.closeDrawer(detail_right);
                 }
 //                    열림 동작
-                else if (!mDrawerLayout.isDrawerOpen(calendar_right)) {
-                    mDrawerLayout.openDrawer(calendar_right);
-//                    if (!detail_memberAdapter.isEmpty()) {
-//                        detail_memberAdapter.clear();
-//                    }
-                    String Detail_URL = "http://192.168.0.93:8080/moim.4t.spring/insertSchemem.tople";
+                else if (!mDrawerLayout.isDrawerOpen(detail_right)) {
+                    mDrawerLayout.openDrawer(detail_right);
+                    if (!detail_memberAdapter.isEmpty()) {
+                        detail_memberAdapter.clear();
+                    }
+                    String Detail_URL = "http://192.168.0.93:8080/moim.4t.spring/selectSchemem.tople";
                     RequestParams params = new RequestParams();
-//                    params.put("detail_todo", detail_todo);
-                    client.get(Detail_URL, params, detail_memberResponse);
+                    params.put("sch_schnum", calendar_item.getSch_schnum());
+                    client.post(Detail_URL, params, detail_memberResponse);
                 }
                 break;
 //                관리자가 편집하는 페이지
@@ -266,6 +281,9 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
                         RequestParams params = new RequestParams();
                         params.put("sch_schnum", calendar_item.getSch_schnum());
                         params.put("id", user_id);
+                        params.put("todo", "1");
+                        params.put("ex", "1");
+                        params.put("amount", calendar_item.getSch_amount());
 
                         client.post(Detail_join_URL, params, new AsyncHttpResponseHandler() {
                             @Override
@@ -325,7 +343,7 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
             @Override
             public void onAnimationEnd(Animator animator) {
 //                작성자 또는 권한이 1인 경우
-                if(mypage_item.getPermit() == 1){
+                if (mypage_item.getPermit() == 1) {
                     fabLayout_sub1.setVisibility(View.VISIBLE);
                     fabLayout_sub2.setVisibility(View.VISIBLE);
                     fabLayout_sub3.setVisibility(View.VISIBLE);

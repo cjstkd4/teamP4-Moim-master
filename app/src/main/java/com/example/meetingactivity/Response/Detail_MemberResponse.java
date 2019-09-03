@@ -1,5 +1,7 @@
 package com.example.meetingactivity.Response;
 
+import android.util.Log;
+
 import com.example.meetingactivity.adapter.Detail_MemberAdapter;
 import com.example.meetingactivity.adapter.MemberAdapter;
 import com.example.meetingactivity.model.Detail_Todo;
@@ -26,23 +28,29 @@ public class Detail_MemberResponse extends AsyncHttpResponseHandler {
     // 통신 성공시
     @Override
     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-
         // 통신 데이터 처리
         String content = new String(responseBody);
         try {
             JSONObject json = new JSONObject(content);
-            JSONArray users = json.getJSONArray("users");
+            JSONArray items = json.getJSONArray("items");
 //            검색 결과 처리
-            for (int i = 0; i < users.length(); i++) {
-                JSONObject jsonObject = users.getJSONObject(i);
-                JSONObject properties = jsonObject.getJSONObject("properties");
-
+            for (int i = 0; i < items.length(); i++) {
+                JSONObject jsonObject = items.getJSONObject(i);
                 Detail_Todo detail_todo = new Detail_Todo();
-                detail_todo.setDetail_item_img(properties.getString("thumbnail_image"));
-                detail_todo.setId(properties.getString("id"));
-                detail_todo.setTodo(properties.getString("todo"));
-                detail_todo.setAmount(properties.getInt("amount"));
-                detail_todo.setEx(properties.getString("ex"));
+
+                if (jsonObject.getString("todo").equals("")) {
+                    detail_todo.setTodo("지정된게 없습니다.");
+                } else {
+                    detail_todo.setTodo(jsonObject.getString("todo"));
+                }
+                if (jsonObject.getString("ex").equals("")) {
+                    detail_todo.setTodo("지정된게 없습니다.");
+                } else {
+                    detail_todo.setEx(jsonObject.getString("ex"));
+                }
+                detail_todo.setDetail_item_img(jsonObject.getString("prof"));
+                detail_todo.setIspay(jsonObject.getBoolean("ispay"));
+                detail_todo.setId(jsonObject.getString("id"));
 //                중복 체크 확인할 것
                 adapter.add(detail_todo);
             }

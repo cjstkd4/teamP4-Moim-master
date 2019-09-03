@@ -295,8 +295,9 @@
         </LinearLayout>
     </android.support.design.widget.CoordinatorLayout>
     <!-- 사용자 명단 -->
+
     <ListView
-        android:id="@+id/Detail_right"
+        android:id="@+id/detail_right"
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:layout_gravity="end"

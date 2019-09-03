@@ -192,7 +192,9 @@ public class MoimActivity extends AppCompatActivity implements View.OnClickListe
 //                열림 동작
                 else if (!mDrawerLayout.isDrawerOpen(drawer_right)) {
                     mDrawerLayout.openDrawer(drawer_right);
-                    memberadapter.clear();
+                    if(!memberadapter.isEmpty()){
+                        memberadapter.clear();
+                    }
                     String member_URL = "http://192.168.0.93:8080/moim.4t.spring/testMoimUsets.tople";
                     RequestParams params = new RequestParams();
                     params.put("moimcode", item1.getMoimcode());

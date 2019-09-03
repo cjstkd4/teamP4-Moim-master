@@ -57,11 +57,11 @@ public class Detail_MemberAdapter extends ArrayAdapter<Detail_Todo> {
 
         Detail_Todo item = getItem(position);
         if(item != null){
-            ImageView Detail_item_img = convertView.findViewById(R.id.memitem_img);
-            TextView Detail_item_name = convertView.findViewById(R.id.memitem_name);
-            TextView Detail_item_todo = convertView.findViewById(R.id.memitem_permit);
+            ImageView Detail_item_img = convertView.findViewById(R.id.Detail_item_img);
+            TextView Detail_item_name = convertView.findViewById(R.id.Detail_item_name);
+            TextView Detail_item_todo = convertView.findViewById(R.id.Detail_item_todo);
             TextView Detail_item_ex = convertView.findViewById(R.id.Detail_item_ex);
-            CheckBox Detail_item_amount = convertView.findViewById(R.id.Detail_item_amount);
+            CheckBox Detail_item_ispay = convertView.findViewById(R.id.Detail_item_ispay);
 
             if(!item.getDetail_item_img().equals("")){
                 imageLoader.displayImage(item.getDetail_item_img(), Detail_item_img, options);
@@ -69,10 +69,11 @@ public class Detail_MemberAdapter extends ArrayAdapter<Detail_Todo> {
             Detail_item_name.setText(item.getId());
             Detail_item_todo.setText(item.getTodo());
             Detail_item_ex.setText(item.getEx());
-            if(item.getAmount() == 0 ){
-                Detail_item_amount.setChecked(false);
+
+            if(item.isIspay() == false){
+                Detail_item_ispay.setChecked(false);
             } else {
-                Detail_item_amount.setChecked(true);
+                Detail_item_ispay.setChecked(true);
             }
         }
 
