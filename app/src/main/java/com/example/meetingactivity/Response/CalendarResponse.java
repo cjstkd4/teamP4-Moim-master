@@ -21,13 +21,6 @@ import cz.msebera.android.httpclient.Header;
 public class CalendarResponse extends AsyncHttpResponseHandler {
     CalendarAdapter adapter;
 
-    // 시스템 날짜
-    String syste_data = "";
-    // 캘린터 날짜
-    String calendar_data = "";
-    // test
-    String test = "";
-
     public CalendarResponse(CalendarAdapter adapter) {
         this.adapter = adapter;
     }
@@ -37,8 +30,6 @@ public class CalendarResponse extends AsyncHttpResponseHandler {
     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
         // 통신 데이터 처리
         String content = new String(responseBody);
-        Log.d("[test]_calRespon", "값 : " +  content);
-
         try {
             JSONObject json = new JSONObject(content);
             JSONArray items = json.getJSONArray("items");
@@ -47,19 +38,19 @@ public class CalendarResponse extends AsyncHttpResponseHandler {
                 JSONObject jsonObject = items.getJSONObject(i);
                 Calendar calendar = new Calendar();
                 calendar.setSch_moimcode(jsonObject.getInt("sch_moimcode"));
-                calendar.setSch_month(jsonObject.getString("sch_month"));
                 calendar.setSch_schnum(jsonObject.getInt("sch_schnum"));
-                calendar.setSch_amount(jsonObject.getInt("sch_amount"));
-                calendar.setSch_day(jsonObject.getString("sch_day"));
-                calendar.setSch_lot(jsonObject.getDouble("sch_lot"));
-                calendar.setSch_lat(jsonObject.getDouble("sch_lat"));
-                calendar.setSch_sub(jsonObject.getString("sch_sub"));
-                calendar.setSch_title(jsonObject.getString("sch_title"));
-                calendar.setSch_time(jsonObject.getString("sch_time"));
                 calendar.setSch_year(jsonObject.getString("sch_year"));
-//
-//                test = CustomCalendarView.Calendar_YM();
-//                calendar_data = calendar.getSch_year() + "-" + calendar.getSch_month();
+                calendar.setSch_month(jsonObject.getString("sch_month"));
+                calendar.setSch_day(jsonObject.getString("sch_day"));
+                calendar.setSch_time(jsonObject.getString("sch_time"));
+                calendar.setSch_title(jsonObject.getString("sch_title"));
+                if (jsonObject.has("sch_sub")) {
+                    calendar.setSch_sub(jsonObject.getString("sch_sub"));
+                }
+                calendar.setSch_amount(jsonObject.getInt("sch_amount"));
+                calendar.setSch_lat(jsonObject.getDouble("sch_lat"));
+                calendar.setSch_lot(jsonObject.getDouble("sch_lot"));
+
                 adapter.add(calendar);
             }
         } catch (JSONException e) {

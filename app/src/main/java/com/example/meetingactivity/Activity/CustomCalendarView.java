@@ -67,9 +67,10 @@ public class CustomCalendarView extends LinearLayout {
     List<Events> eventsList = new ArrayList<>();
     DBOpenHelper dbOpenHelper;
 
-    public CustomCalendarView(Context context) {
-        super(context);
-    }
+//    public CustomCalendarView(Context context) {
+//        super(context);
+//        Log.d("[test]_custCal", "11111");
+//    }
 
     //    fragment에서 값을 전달 받아서 item값 가져오기
     public static void CustomCalendar_date(Mypage custom_item, String custom_user_id) {
@@ -81,7 +82,6 @@ public class CustomCalendarView extends LinearLayout {
         super(context, attrs);
         this.context = context;
         IntializeLayout();
-        getCalendar_list();
         SetUpCalendar();
 
         prevButton.setOnClickListener(new View.OnClickListener() {
@@ -186,7 +186,7 @@ public class CustomCalendarView extends LinearLayout {
                 intent.putExtra("mypage_item", mypage_item);
                 intent.putExtra("user_id", user_id);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//                startActivity(intent);
+                context.startActivity(intent);
             }
         });
     }
@@ -219,6 +219,7 @@ public class CustomCalendarView extends LinearLayout {
         dbOpenHelper.close();
     }
 
+    // custom에서 초기화를 여기서 해줘야 한다.
     private void IntializeLayout() {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View view = inflater.inflate(R.layout.calendar_layout, this);
@@ -226,6 +227,14 @@ public class CustomCalendarView extends LinearLayout {
         prevButton = view.findViewById(R.id.previousBtn);
         CurrentDate = view.findViewById(R.id.current_Date);
         gridView = view.findViewById(R.id.gridview);
+        client = new AsyncHttpClient();
+        calendar_List = new ArrayList<>();
+        calendar_listView = findViewById(R.id.Calendar_listView);
+        calendarAdapter = new CalendarAdapter(context, R.layout.calendar_item, calendar_List);
+        calendarResponse = new CalendarResponse(calendarAdapter);
+        calendar_listView.setAdapter(calendarAdapter);
+
+        getCalendar_list();
     }
 
     // 달력 년 월을 보여주는 toolbar 기능을 하는 곳에 대한 설정
@@ -270,15 +279,8 @@ public class CustomCalendarView extends LinearLayout {
 
 
     private void getCalendar_list() {
-//        달력 listview 초기화
-        client = new AsyncHttpClient();
-        calendar_List = new ArrayList<>();
-        calendar_listView = findViewById(R.id.Calendar_listView);
-        calendarAdapter = new CalendarAdapter(context, R.layout.calendar_item, calendar_List);
-        calendarResponse = new CalendarResponse(calendarAdapter);
-        calendar_listView.setAdapter(calendarAdapter);
 
-        if (!calendarAdapter.isEmpty()) {
+        if(!calendarAdapter.isEmpty()){
             calendarAdapter.clear();
         }
 
@@ -289,7 +291,6 @@ public class CustomCalendarView extends LinearLayout {
             params.put("sch_moimcode", mypage_item.getMoimcode());
             params.put("sch_year", year);
             params.put("sch_month", month);
-            Log.d("[test]_custom", "값 : " + mypage_item.getMoimcode() + " / " + year + " / " + month);
             client.post(URL, params, calendarResponse);
         } else {
             String URL = "http://192.168.0.93:8080/moim.4t.spring/selectScheduleMonth.tople";
@@ -297,10 +298,9 @@ public class CustomCalendarView extends LinearLayout {
             params.put("sch_moimcode", mypage_item.getMoimcode());
             params.put("sch_year", str_year);
             params.put("sch_month", str_month);
-            Log.d("[test]_custom", "str_값 : " + mypage_item.getMoimcode() + " / " + str_year + " / " + str_month);
             client.post(URL, params, calendarResponse);
         }
-//        calendarAdapter.notifyDataSetChanged();
+        calendarAdapter.notifyDataSetChanged();
     }
 
     private void calendarDate() {

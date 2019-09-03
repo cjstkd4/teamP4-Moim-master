@@ -86,7 +86,6 @@ public class CalendarFragment extends Fragment {
 //        달력 객체 초기화
         customCalendarView = (CustomCalendarView) view.findViewById(R.id.custom_calendar_view);
 
-
 //        intent와 bundle로 가져온 데이터
         if (getArguments() != null) {
             user_id = getArguments().getString("user_id");
@@ -95,6 +94,8 @@ public class CalendarFragment extends Fragment {
 
         return view;
     }
+
+
 
     @Override
     public void onAttach(Context context) {

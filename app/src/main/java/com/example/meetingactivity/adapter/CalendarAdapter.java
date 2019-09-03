@@ -34,6 +34,7 @@ public class CalendarAdapter extends ArrayAdapter<Calendar> {
 
         Calendar item = getItem(position);
         if (item != null) {
+            Log.d("[test]_cal_adap", "getCount() = " + getCount());
             TextView calendar_Name = convertView.findViewById(R.id.calendar_Name);
             TextView calendar_Date = convertView.findViewById(R.id.calendar_Date);
             TextView calendar_Money = convertView.findViewById(R.id.calendar_Money);
