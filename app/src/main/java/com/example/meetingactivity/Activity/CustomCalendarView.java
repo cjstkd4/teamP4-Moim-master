@@ -36,7 +36,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class CustomCalendarView extends LinearLayout {
-    private static int item_moimcode;
+    private static Mypage mypage_item;
+    private static String user_id;
 
     ImageButton nextButton, prevButton;
     TextView CurrentDate;
@@ -52,12 +53,14 @@ public class CustomCalendarView extends LinearLayout {
     SimpleDateFormat eventDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.KOREAN);
 
     MyGridAdapter myGridAdapter;
-    String str_year;
-    String str_month;
 
     AsyncHttpClient client;
+    List<com.example.meetingactivity.model.Calendar> calendar_List;
+    ListView calendar_listView;
+    CalendarAdapter calendarAdapter;
     CalendarResponse calendarResponse;
-
+    com.example.meetingactivity.model.Calendar calendar_item;
+    String year, month, str_year, str_month;
 
     //    AlertDialog alertDialog;
     List<Date> dates = new ArrayList<>();
@@ -68,15 +71,18 @@ public class CustomCalendarView extends LinearLayout {
         super(context);
     }
 
+    //    fragment에서 값을 전달 받아서 item값 가져오기
+    public static void CustomCalendar_date(Mypage custom_item, String custom_user_id) {
+        mypage_item = custom_item;
+        user_id = custom_user_id;
+    }
+
     public CustomCalendarView(final Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
         IntializeLayout();
+        getCalendar_list();
         SetUpCalendar();
-        Log.d("[test]_cal_frag","값 1");
-
-//        client = new AsyncHttpClient();
-//        calendarResponse = new CalendarResponse();
 
         prevButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,13 +92,7 @@ public class CustomCalendarView extends LinearLayout {
 
                 str_year = yearFormat.format(calendar.getTime());
                 str_month = monthFormat.format(calendar.getTime());
-
-                CalendarFragment calendarFragment = new CalendarFragment();
-                Bundle bundle = new Bundle();
-                bundle.putString("str_year", str_year);
-                bundle.putString("str_month", str_month);
-                calendarFragment.setArguments(bundle);
-
+                getCalendar_list();
             }
         });
 
@@ -103,6 +103,7 @@ public class CustomCalendarView extends LinearLayout {
                 SetUpCalendar();
                 str_year = yearFormat.format(calendar.getTime());
                 str_month = monthFormat.format(calendar.getTime());
+                getCalendar_list();
             }
         });
 
@@ -164,7 +165,7 @@ public class CustomCalendarView extends LinearLayout {
                     public void onClick(View v) {
                         // 화면 전환
                         Intent intent = new Intent(context, Calendar_WriteActivity.class);
-                        intent.putExtra("moimcode", item_moimcode);
+                        intent.putExtra("moimcode", mypage_item.getMoimcode());
                         intent.putExtra("year", year);
                         intent.putExtra("month", month);
                         intent.putExtra("day", dayOfMonth);
@@ -174,11 +175,20 @@ public class CustomCalendarView extends LinearLayout {
                 builder.show();
             }
         });
-    }
 
-    //    fragment에서 값을 전달 받아서 item값 가져오기
-    public static void CustomCalendar_date(Mypage item) {
-        item_moimcode = item.getMoimcode();
+        calendar_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                calendar_item = calendarAdapter.getItem(position);
+
+                Intent intent = new Intent(context, Calendar_ReadActivity.class);
+                intent.putExtra("calendar_item", calendar_item);
+                intent.putExtra("mypage_item", mypage_item);
+                intent.putExtra("user_id", user_id);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//                startActivity(intent);
+            }
+        });
     }
 
     private ArrayList<Events> CollectEvenetByDate(String date) {
@@ -200,10 +210,6 @@ public class CustomCalendarView extends LinearLayout {
         cursor.close();
         dbOpenHelper.close();
         return arrayList;
-    }
-
-    public CustomCalendarView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
     }
 
     private void SaveEnvet(String event, String time, String date, String month, String year) {
@@ -260,5 +266,50 @@ public class CustomCalendarView extends LinearLayout {
         }
         cursor.close();
         dbOpenHelper.close();
+    }
+
+
+    private void getCalendar_list() {
+//        달력 listview 초기화
+        client = new AsyncHttpClient();
+        calendar_List = new ArrayList<>();
+        calendar_listView = findViewById(R.id.Calendar_listView);
+        calendarAdapter = new CalendarAdapter(context, R.layout.calendar_item, calendar_List);
+        calendarResponse = new CalendarResponse(calendarAdapter);
+        calendar_listView.setAdapter(calendarAdapter);
+
+        if (!calendarAdapter.isEmpty()) {
+            calendarAdapter.clear();
+        }
+
+        calendarDate();
+        if ((str_year == null) || (str_month == null)) {
+            String URL = "http://192.168.0.93:8080/moim.4t.spring/selectScheduleMonth.tople";
+            RequestParams params = new RequestParams();
+            params.put("sch_moimcode", mypage_item.getMoimcode());
+            params.put("sch_year", year);
+            params.put("sch_month", month);
+            Log.d("[test]_custom", "값 : " + mypage_item.getMoimcode() + " / " + year + " / " + month);
+            client.post(URL, params, calendarResponse);
+        } else {
+            String URL = "http://192.168.0.93:8080/moim.4t.spring/selectScheduleMonth.tople";
+            RequestParams params = new RequestParams();
+            params.put("sch_moimcode", mypage_item.getMoimcode());
+            params.put("sch_year", str_year);
+            params.put("sch_month", str_month);
+            Log.d("[test]_custom", "str_값 : " + mypage_item.getMoimcode() + " / " + str_year + " / " + str_month);
+            client.post(URL, params, calendarResponse);
+        }
+//        calendarAdapter.notifyDataSetChanged();
+    }
+
+    private void calendarDate() {
+        // 시스템의 오늘 날짜 년, 월 구하기
+        Date TodayDate = java.util.Calendar.getInstance().getTime();
+        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+        SimpleDateFormat monthFormat = new SimpleDateFormat("MM", Locale.getDefault());
+
+        year = yearFormat.format(TodayDate);
+        month = monthFormat.format(TodayDate);
     }
 }

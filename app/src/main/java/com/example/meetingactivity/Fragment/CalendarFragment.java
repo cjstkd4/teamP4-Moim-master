@@ -41,13 +41,6 @@ public class CalendarFragment extends Fragment {
     String user_id;
     Mypage item;
     CustomCalendarView customCalendarView;
-    AsyncHttpClient client;
-    List<Calendar> calendar_List;
-    ListView calendar_listView;
-    CalendarAdapter calendarAdapter;
-    CalendarResponse calendarResponse;
-    Calendar calendar_item;
-    String year, month, str_year, str_month;
 
     private String mParam1;
     private String mParam2;
@@ -81,7 +74,7 @@ public class CalendarFragment extends Fragment {
             user_id = getArguments().getString("user_id");
             item = (Mypage) getArguments().getSerializable("item");
         }
-        CustomCalendarView.CustomCalendar_date(item);
+        CustomCalendarView.CustomCalendar_date(item, user_id);
     }
 
     @Override
@@ -99,30 +92,6 @@ public class CalendarFragment extends Fragment {
             user_id = getArguments().getString("user_id");
             item = (Mypage) getArguments().getSerializable("item");
         }
-//        달력 listview 선언
-        client = new AsyncHttpClient();
-        calendar_List = new ArrayList<>();
-        calendarAdapter = new CalendarAdapter(getActivity(), R.layout.calendar_item, calendar_List);
-        calendar_listView = view.findViewById(R.id.Calendar_listView);
-        calendar_listView.setAdapter(calendarAdapter);
-        calendarResponse = new CalendarResponse(calendarAdapter);
-
-
-        getCalendar_list();
-
-        calendar_listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                calendar_item = calendarAdapter.getItem(position);
-
-                Intent intent = new Intent(getActivity(), Calendar_ReadActivity.class);
-                intent.putExtra("calendar_item", calendar_item);
-                intent.putExtra("mypage_item", item);
-                intent.putExtra("user_id", user_id);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                startActivity(intent);
-            }
-        });
 
         return view;
     }
@@ -139,17 +108,6 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Bundle bundle = getArguments();
-        str_year = bundle.getString("str_year");
-        str_month = bundle.getString("str_month");
-        Log.d("[test]_cal_frag", "값 2");
-        Log.d("[test]_cal_frag", "값 : " + str_year + " / " + str_month);
-        getCalendar_list();
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
@@ -157,37 +115,5 @@ public class CalendarFragment extends Fragment {
 
     public interface OnFragmentInteractionListener {
         void onFragmentInteraction(Uri uri);
-    }
-
-    private void getCalendar_list() {
-        calendarAdapter.clear();
-
-        calendarDate();
-
-//        if(str_year.equals("") || str_month.equals("")){
-        String URL = "http://192.168.0.93:8080/moim.4t.spring/selectScheduleMonth.tople";
-        RequestParams params = new RequestParams();
-        params.put("sch_moimcode", item.getMoimcode());
-        params.put("sch_year", year);
-        params.put("sch_month", month);
-        client.post(URL, params, calendarResponse);
-//        } else {
-//            String URL = "http://192.168.0.93:8080/moim.4t.spring/selectScheduleMonth.tople";
-//            RequestParams params = new RequestParams();
-//            params.put("sch_moimcode", item.getMoimcode());
-//            params.put("sch_year", str_year);
-//            params.put("sch_month", str_month);
-//            client.post(URL, params, calendarResponse);
-//        }
-    }
-
-    private void calendarDate() {
-        // 시스템의 오늘 날짜 년, 월 구하기
-        Date TodayDate = java.util.Calendar.getInstance().getTime();
-        SimpleDateFormat yearFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
-        SimpleDateFormat monthFormat = new SimpleDateFormat("MM", Locale.getDefault());
-
-        year = yearFormat.format(TodayDate);
-        month = monthFormat.format(TodayDate);
     }
 }

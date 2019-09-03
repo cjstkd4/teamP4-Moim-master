@@ -7,53 +7,9 @@
     android:id="@+id/Calendar_Fragment"
     tools:context=".Fragment.CalendarFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
-    <ScrollView
+    <com.example.meetingactivity.Activity.CustomCalendarView
+        android:id="@+id/custom_calendar_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <com.example.meetingactivity.Activity.CustomCalendarView
-                    android:id="@+id/custom_calendar_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
-
-                </com.example.meetingactivity.Activity.CustomCalendarView>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/textView"
-                android:layout_width="match_parent"
-                android:layout_height="3dp"
-                android:background="#E9E9E9" />
-
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-
-                    <ListView
-                        android:id="@+id/Calendar_listView"
-                        android:layout_width="match_parent"
-                        android:layout_height="291dp" />
-                </LinearLayout>
-            </ScrollView>
-
-        </LinearLayout>
-    </ScrollView>
-
+    </com.example.meetingactivity.Activity.CustomCalendarView>
 </LinearLayout>

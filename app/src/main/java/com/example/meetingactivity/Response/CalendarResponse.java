@@ -37,7 +37,8 @@ public class CalendarResponse extends AsyncHttpResponseHandler {
     public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
         // 통신 데이터 처리
         String content = new String(responseBody);
-        Log.d("[test]_cal_reponse", "값 : " + content);
+        Log.d("[test]_calRespon", "값 : " +  content);
+
         try {
             JSONObject json = new JSONObject(content);
             JSONArray items = json.getJSONArray("items");
@@ -59,7 +60,6 @@ public class CalendarResponse extends AsyncHttpResponseHandler {
 //
 //                test = CustomCalendarView.Calendar_YM();
 //                calendar_data = calendar.getSch_year() + "-" + calendar.getSch_month();
-
                 adapter.add(calendar);
             }
         } catch (JSONException e) {
