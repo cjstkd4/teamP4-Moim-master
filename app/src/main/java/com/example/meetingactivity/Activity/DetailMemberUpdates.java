@@ -1,4 +1,4 @@
-package com.example.meetingactivity;
+package com.example.meetingactivity.Activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -9,9 +9,9 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.meetingactivity.R;
 import com.example.meetingactivity.model.Calendar;
 import com.example.meetingactivity.model.Detail_Todo;
-import com.example.meetingactivity.model.Mypage;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;

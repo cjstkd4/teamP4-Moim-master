@@ -22,7 +22,6 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.meetingactivity.DetailMemberUpdates;
 import com.example.meetingactivity.R;
 import com.example.meetingactivity.Response.Detail_MemberResponse;
 import com.example.meetingactivity.adapter.Detail_MemberAdapter;
@@ -75,6 +74,9 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
     AsyncHttpClient client;
     Detail_MemberAdapter detail_memberAdapter;
     Detail_MemberResponse detail_memberResponse;
+    String Detail_member_check_URL = "http://192.168.0.93:8080/moim.4t.spring/selectSchemem.tople";
+    String Detail_one_URL = "http://192.168.0.93:8080/moim.4t.spring/selectSchedule.tople";
+    String Detail_join_URL = "http://192.168.0.93:8080/moim.4t.spring/insertSchemem.tople";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,29 +125,20 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
         fab_sub3.setOnClickListener(this);
         detail_read_bt2.setOnClickListener(this);
 
-
-//        if (mypage_item.getPermit() == 1) {
-        //                detail_todo = detail_memberAdapter.getItem(position);
-//                Intent intent1 = new Intent(Calendar_ReadActivity.this, Detail_member_Update.class);
-//                intent1.putExtra("calendar_item", calendar_item);
-//                intent1.putExtra("mypage_item", mypage_item);
-//                intent1.putExtra("detail_todo", detail_todo);
-//                intent1.putExtra("user_id", user_id);
-//
-//                Calendar_ReadActivity.this.startActivity(intent1);
-//        }
-        detail_right.setOnItemClickListener(new ListView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                detail_todo = detail_memberAdapter.getItem(position);
-                Intent intent = new Intent(Calendar_ReadActivity.this, DetailMemberUpdates.class);
-                intent.putExtra("calendar_item", calendar_item);
-                intent.putExtra("detail_todo", detail_todo);
-                intent.putExtra("user_id", user_id);
-                Log.d("[test]_cal_read", "user_id : " + user_id);
-                startActivity(intent);
-            }
-        });
+        if (mypage_item.getPermit() == 1) {
+            detail_right.setOnItemClickListener(new ListView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    detail_todo = detail_memberAdapter.getItem(position);
+                    Intent intent = new Intent(Calendar_ReadActivity.this, DetailMemberUpdates.class);
+                    intent.putExtra("calendar_item", calendar_item);
+                    intent.putExtra("detail_todo", detail_todo);
+                    intent.putExtra("user_id", user_id);
+                    Log.d("[test]_cal_read", "user_id : " + user_id);
+                    startActivity(intent);
+                }
+            });
+        }
 
         permissionCheck();
     }
@@ -158,7 +151,6 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
     }
 
     private void client_connection() {
-        String Detail_one_URL = "http://192.168.0.93:8080/moim.4t.spring/selectSchedule.tople";
         RequestParams params = new RequestParams();
         params.put("sch_schnum", calendar_item.getSch_schnum());
         client.get(Detail_one_URL, params, new AsyncHttpResponseHandler() {
@@ -224,6 +216,7 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
     @Override
     public void onClick(View v) {
         Intent intent = null;
+        RequestParams params = null;
         switch (v.getId()) {
             case R.id.detail_read_bt2:
                 finish();
@@ -237,6 +230,12 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
                 break;
 //                참석 여부 묻기
             case R.id.fab_sub1:
+                for (int i=0; i<detail_memberAdapter.getCount(); i++) {
+                    Detail_Todo temp = detail_memberAdapter.getItem(i);
+                    if (temp.getId() == user_id) {
+                        return;
+                    }
+                }
                 joinDialog();
                 break;
 //                참가자 인원 확인
@@ -251,10 +250,10 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
                     if (!detail_memberAdapter.isEmpty()) {
                         detail_memberAdapter.clear();
                     }
-                    String Detail_URL = "http://192.168.0.93:8080/moim.4t.spring/selectSchemem.tople";
-                    RequestParams params = new RequestParams();
+//                    일정 참가자 확인
+                    params = new RequestParams();
                     params.put("sch_schnum", calendar_item.getSch_schnum());
-                    client.post(Detail_URL, params, detail_memberResponse);
+                    client.post(Detail_member_check_URL, params, detail_memberResponse);
                 }
                 break;
 //                관리자가 편집하는 페이지
@@ -276,7 +275,6 @@ public class Calendar_ReadActivity extends AppCompatActivity implements View.OnC
 //                참가 : 예
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String Detail_join_URL = "http://192.168.0.93:8080/moim.4t.spring/insertSchemem.tople";
 
                         RequestParams params = new RequestParams();
                         params.put("sch_schnum", calendar_item.getSch_schnum());
